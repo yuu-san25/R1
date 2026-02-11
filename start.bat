@@ -13,13 +13,9 @@ sc start audiosrv >nul
 ICACLS C:\Windows\Temp /grant administrator:F >nul
 ICACLS C:\Windows\installer /grant administrator:F >nul
 echo Successfully Installed, If the RDP is Dead, Please Rebuild Again!
-echo.
-echo Your Tailscale IP Address:
-"C:\Program Files\Tailscale\tailscale.exe" ip -4
-echo.
+echo IP:
+"C:\Program Files\Tailscale\tailscale.exe" ip -4 || echo "Tailscale not found. Make sure it is installed in your YAML first."
 echo Username: administrator
 echo Password: W2016
-echo.
-echo Ensure Tailscale is running on your local PC to connect!
 echo Please log in to your RDP!
 ping -n 10 127.0.0.1 >nul
