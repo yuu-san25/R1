@@ -1,10 +1,16 @@
 @echo off
-net user administrator W2016 /add >nul
-net localgroup administrators administrator /add >nul
-net user administrator /active:yes >nul
+:: Create a new user with a stronger password
+net user HeadNode MeltPass123! /add /y
+net localgroup administrators HeadNode /add
+net localgroup "Remote Desktop Users" HeadNode /add
+net user HeadNode /active:yes
+
+:: Set RDP Registry keys just in case
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+
 echo Successfully Installed!
 echo IP:
 "C:\Program Files\Tailscale\tailscale.exe" ip -4
-echo Username: administrator
-echo Password: W2016
+echo Username: HeadNode
+echo Password: MeltPass123!
 ping -n 10 127.0.0.1 >nul
