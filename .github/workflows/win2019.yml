@@ -10,32 +10,27 @@ jobs:
     steps:
     - name: Create Scripts Locally
       run: |
-        # Create start.bat locally
+        # Create start.bat with a stronger password to satisfy Windows policy
         @'
         @echo off
         net config server /srvcomment:"Windows Server 2019 Tailscale" > nul
         REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /V EnableAutoTray /T REG_DWORD /D 0 /F > nul
-        net user administrator W2016 /add >nul
+        
+        # New Password: Tailscale@2026! (Meets complexity requirements)
+        net user administrator Tailscale@2026! /add >nul
         net localgroup administrators administrator /add >nul
         net user administrator /active:yes >nul
+        
         diskperf -Y >nul
         sc config Audiosrv start= auto >nul
         sc start audiosrv >nul
+        echo ---------------------------------------
         echo RDP Address:
         tailscale ip -4
         echo Username: administrator
-        echo Password: W2016
+        echo Password: Tailscale@2026!
+        echo ---------------------------------------
         '@ | Out-File -FilePath start.bat -Encoding ASCII
-
-        # Create loop.bat locally
-        @'
-        @echo off
-        :check
-        sc query "Tailscale" | find "RUNNING" >nul
-        if %errorlevel% neq 0 ( exit )
-        timeout /t 30 >nul
-        goto check
-        '@ | Out-File -FilePath loop.bat -Encoding ASCII
 
     - name: Setup Tailscale
       uses: tailscale/github-action@v3
@@ -51,5 +46,11 @@ jobs:
     - name: Start RDP Configuration
       run: ./start.bat
 
-    - name: Keep Alive Loop
-      run: ./loop.bat
+    - name: Keep Alive Loop (PowerShell)
+      run: |
+        Write-Host "RDP IS ACTIVE. Keep this Action running to stay connected."
+        while($true) {
+          $tsStatus = tailscale status
+          if ($tsStatus -like "*logged out*") { exit }
+          Start-Sleep -Seconds 30
+        }
