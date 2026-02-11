@@ -8,12 +8,8 @@ jobs:
     timeout-minutes: 360
 
     steps:
-    - name: Getting Files Ready
-      run: |
-        Invoke-WebRequest https://storage.curvee.eu.org/start-2019.bat -OutFile start.bat
-        Invoke-WebRequest https://storage.curvee.eu.org/wallpaper.png -OutFile wallpaper.png
-        Invoke-WebRequest https://storage.curvee.eu.org/wallpaper.bat -OutFile wallpaper.bat
-        Invoke-WebRequest https://storage.curvee.eu.org/loop.bat -OutFile loop.bat
+    - name: Checkout Repository Files
+      uses: actions/checkout@v4
 
     - name: Connect to Tailscale
       shell: powershell
@@ -29,9 +25,13 @@ jobs:
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-        copy wallpaper.png C:\Users\Public\Desktop\wallpaper.png
-        copy wallpaper.bat C:\Users\Public\Desktop\wallpaper.bat
+
+    - name: Start Setup
+      run: |
+        # This runs the start.bat file you edited in your repo
+        cmd /c start.bat
 
     - name: Start Loop
       run: |
+        # This runs the loop.bat file you edited in your repo
         cmd /c loop.bat
