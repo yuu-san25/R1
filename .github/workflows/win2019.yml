@@ -25,7 +25,11 @@ jobs:
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-
+  
+    - name: Pre-install Dask
+      run: |
+        pip install dask distributed
+    
     - name: Start Setup
       run: |
         # This runs the start.bat file you edited in your repo
