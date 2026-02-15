@@ -20,22 +20,19 @@ jobs:
         & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=${{ secrets.TAILSCALE_AUTH_KEY }} --hostname=github-head
         & "C:\Program Files\Tailscale\tailscale.exe" ip -4
 
-    - name: Enabling access to RDP.
+    - name: Enabling access to RDP
       run: |
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
   
-    - name: Pre-install Dask
+    - name: Start Setup with Rclone Config
+      env:
+        RCLONE_CONFIG_SECRET: ${{ secrets.RCLONE_CONF }} # Add your rclone.conf content to GitHub Secrets!
       run: |
-        pip install dask distributed
-    
-    - name: Start Setup
-      run: |
-        # This runs the start.bat file you edited in your repo
         cmd /c start.bat
 
     - name: Start Loop
       run: |
-        # This runs the loop.bat file you edited in your repo
+        # Keep the action alive
         cmd /c loop.bat
