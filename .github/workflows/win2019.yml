@@ -26,24 +26,11 @@ jobs:
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
   
-    - name: Start Setup with Rclone Config
-      shell: powershell
-      env:
-        RCLONE_CONFIG_BODY: ${{ secrets.RCLONE_CONF }}
+    - name: Start Setup
       run: |
-        # Create the rclone directory
-        New-Item -ItemType Directory -Force -Path "C:\rclone"
-        
-        # Safely write the secret to the config file
-        $env:RCLONE_CONFIG_BODY | Out-File -FilePath "C:\rclone\rclone.conf" -Encoding ascii
-        
-        # Verify the file isn't just "ECHO is off" (for your logs)
-        Get-Content "C:\rclone\rclone.conf" -TotalCount 1
-        
-        # Now run the rest of the setup
         cmd /c start.bat
 
     - name: Start Loop
       run: |
-        # Keep the action alive
+        # This keeps the machine alive for you to work
         cmd /c loop.bat
