@@ -28,3 +28,4 @@ start /b dask scheduler
 
 echo Setup Complete!
 "C:\Program Files\Tailscale\tailscale.exe" ip -4
+
